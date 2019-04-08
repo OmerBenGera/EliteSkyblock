@@ -60,7 +60,7 @@ public abstract class CommandBase extends ManagerObject<String> implements Comma
 
         String command();
 
-        String permission() default "Core.user";
+        String permission() default "skyblock.use";
 
         boolean onlyPlayers() default true;
 

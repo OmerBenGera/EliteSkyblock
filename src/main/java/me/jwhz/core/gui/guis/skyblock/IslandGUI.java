@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static me.jwhz.core.Core.pl;
+
 import static org.bukkit.ChatColor.YELLOW;
 
 public class IslandGUI extends GUI {
@@ -42,7 +43,7 @@ public class IslandGUI extends GUI {
 
     }
 
-    @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
 
         e.setCancelled(true);

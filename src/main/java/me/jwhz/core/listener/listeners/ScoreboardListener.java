@@ -49,7 +49,7 @@ public class ScoreboardListener extends EventClass {
             e.setLine(e.getLine().replace("{island_coop_size}", (island == null ? "A" : island.coop.size() + 1) + ""));
 
         if (core.usingPlaceholderAPI)
-            e.setLine(PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(e.getUUID()), e.getLine()));
+            e.setLine(PlaceholderAPI.setPlaceholders(player, e.getLine()));
 
 
     }

@@ -1,7 +1,10 @@
 package me.jwhz.core;
 
+import com.google.common.collect.Maps;
 import me.jwhz.core.command.CommandManager;
 import me.jwhz.core.listener.EventManager;
+import me.jwhz.core.mines.BlockBreakListener;
+import me.jwhz.core.mines.OreRegenManager;
 import me.jwhz.core.scoreboard.Scoreboard;
 import me.jwhz.core.scoreboard.ScoreboardManager;
 import me.jwhz.core.skyblock.SkyblockManager;
@@ -9,19 +12,22 @@ import me.jwhz.core.skyblock.islands.Island;
 import me.jwhz.core.skyblock.leveling.LevelSystem;
 import me.jwhz.core.skyblock.schematics.SchematicsManager;
 import me.jwhz.core.tpqueue.TPQueue;
+import me.jwhz.core.utils.FileManager;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Core extends JavaPlugin {
+import java.util.HashMap;
+
+public class Core extends JavaPlugin implements Listener {
 
     private static Core instance;
-    public static Core pl;
     public static Economy economy;
     public static Chat chat;
 
@@ -32,24 +38,29 @@ public class Core extends JavaPlugin {
     public LevelSystem levelSystem;
     public TPQueue tpQueue;
     public ScoreboardManager scoreboardManager;
+    public FileManager worth;
+
+    public static HashMap<String, Long> worthValues = Maps.newHashMap();
 
     public boolean usingPlaceholderAPI;
+
     @Override
     public void onEnable() {
 
         instance = this;
-        pl = this;
 
         saveDefaultConfig();
 
-        if(!setupEconomy() || !setupChat()){
-
-            System.out.println("No proper economy or chat/permission plugin setup! Disabling plugin");
+        if (!setupEconomy()) {
+            System.out.println("No proper economy plugin setup! Disabling plugin");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
-
         }
 
+        worth = new FileManager(this, "worth", getDataFolder().getAbsolutePath());
+
+        OreRegenManager.init(this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         usingPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
         ConfigurationSerialization.registerClass(Island.class, "Island");
@@ -68,46 +79,37 @@ public class Core extends JavaPlugin {
 
         scoreboardManager = new ScoreboardManager();
 
+        getServer().getPluginManager().registerEvents(this, this);
+
+        fetchValues();
+
         if (scoreboardManager.getYamlConfiguration().getBoolean("scoreboard-enabled"))
             for (Player player : Bukkit.getOnlinePlayers())
                 scoreboardManager.getList().add(new Scoreboard(player));
 
         new BukkitRunnable() {
-
             @Override
             public void run() {
-
                 levelSystem.reloadTopTen();
-
             }
-
-        }.runTaskTimer(this, 0, 20 * 60);
+        }.runTaskTimer(this, 1L, 20 * 60);
 
         new BukkitRunnable() {
-
             @Override
             public void run() {
-
                 for (Scoreboard scoreboard : scoreboardManager.getList())
                     scoreboard.update();
-
             }
-
-        }.runTaskTimer(this, 0, 1);
+        }.runTaskTimer(this, 20L, 20L);
 
         new BukkitRunnable() {
-
             @Override
             public void run() {
-
                 for (Player player : Bukkit.getOnlinePlayers())
                     if (player.getWorld().getName().equalsIgnoreCase("skyblock"))
                         skyblockManager.sendWorldBorder(player);
-
             }
-
         }.runTaskTimer(this, 0, 20);
-
 
     }
 
@@ -119,7 +121,7 @@ public class Core extends JavaPlugin {
 
     private boolean setupChat() {
         RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        if(rsp == null)
+        if (rsp == null)
             return false;
         chat = rsp.getProvider();
         return chat != null;
@@ -135,6 +137,11 @@ public class Core extends JavaPlugin {
         }
         economy = rsp.getProvider();
         return economy != null;
+    }
+
+    public void fetchValues(){
+        worthValues.clear();
+        worth.getConfiguration().getConfigurationSection("Worth").getKeys(false).forEach(key -> worthValues.put(key, worth.getConfiguration().getLong("Worth." + key)));
     }
 
 }

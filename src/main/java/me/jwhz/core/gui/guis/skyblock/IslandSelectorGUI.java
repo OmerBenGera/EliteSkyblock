@@ -1,6 +1,7 @@
 package me.jwhz.core.gui.guis.skyblock;
 
 import me.jwhz.core.ChatConfirming;
+import me.jwhz.core.Core;
 import me.jwhz.core.gui.GUI;
 import me.jwhz.core.skyblock.schematics.Schematic;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -9,7 +10,10 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -17,12 +21,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+
 
 public class IslandSelectorGUI extends GUI {
 
@@ -132,22 +139,37 @@ public class IslandSelectorGUI extends GUI {
                                     long finished = System.currentTimeMillis();
 
                                     new BukkitRunnable() {
-
                                         @Override
                                         public void run() {
-
                                             player.teleport(core.skyblockManager.getIsland(player.getUniqueId()).spawn);
-
+                                            Location location = player.getLocation().add(1, 0, 0);
+                                            Block block = location.getBlock();
+                                            location.getBlock().setType(Material.CHEST);
+                                            Chest chest = (Chest)block.getState();
+                                            Inventory inv = chest.getInventory();
+                                            for (int i = 0; i < inv.getSize(); ++i){
+                                                inv.setItem(i, createItem(i));
+                                            }
                                             player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Island created!" + ChatColor.YELLOW + " Use /is help for island related commands.");
-
                                         }
                                     }.runTaskTimer(core, 0, (5 - (finished - startedTime)) * 20);
+
                                     break;
                                 }
                             }
 
                 }
 
+            }
+
+            public ItemStack createItem(int slot){
+                ItemStack i;
+                try {
+                    i = new ItemStack(Material.valueOf(Core.getInstance().getConfig().getString("Island.chest." + slot + ".material")));
+                }catch (NullPointerException e){
+                    return new ItemStack(Material.AIR);
+                }
+                return i;
             }
 
             @EventHandler

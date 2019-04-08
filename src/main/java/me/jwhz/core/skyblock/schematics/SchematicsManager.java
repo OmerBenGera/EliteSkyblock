@@ -24,7 +24,6 @@ public class SchematicsManager extends Manager<Schematic> {
                 if (file.getName().endsWith(".schematic"))
                     schematics.add(new Schematic(file));
 
-
     }
 
 }

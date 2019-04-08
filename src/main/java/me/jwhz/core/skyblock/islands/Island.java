@@ -34,6 +34,7 @@ public class Island extends ManagerObject<String> implements ConfigurationSerial
     public Point min, max;
     public Settings settings;
     public Upgrades upgrades;
+    public int maxMemeberAmount;
 
     public Island(Player player, Location location, Schematic schematic) {
 
@@ -48,6 +49,8 @@ public class Island extends ManagerObject<String> implements ConfigurationSerial
 
         chosenSchematic = schematic.getName();
 
+        maxMemeberAmount = Core.getInstance().getConfig().getInt("Island.max_member_amount");
+
         spawn = new Location(location.getWorld(), location.getBlockX() + 75, 80, location.getBlockZ() + 75);
 
         EditSession es = WorldEdit.getInstance().getEditSessionFactory()
@@ -56,14 +59,14 @@ public class Island extends ManagerObject<String> implements ConfigurationSerial
         CuboidClipboard cc = null;
         try {
             cc = format.load(schematic.file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (DataException e) {
+        } catch (IOException | DataException e) {
             e.printStackTrace();
         }
 
         try {
-            cc.paste(es, new Vector(spawn.getX(), spawn.getY(), spawn.getZ()), false);
+            if (cc != null) {
+                cc.paste(es, new Vector(spawn.getX(), spawn.getY(), spawn.getZ()), false);
+            }
         } catch (MaxChangedBlocksException e) {
             e.printStackTrace();
         }
@@ -117,6 +120,7 @@ public class Island extends ManagerObject<String> implements ConfigurationSerial
         items.put("Schematic", chosenSchematic);
         items.put("Upgrades", upgrades.serialize());
         items.put("Settings", settings.serialize());
+        items.put("Max_Members", maxMemeberAmount);
 
         return items;
     }

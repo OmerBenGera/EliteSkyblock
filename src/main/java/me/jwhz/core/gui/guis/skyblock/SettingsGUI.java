@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -35,7 +36,7 @@ public class SettingsGUI extends GUI {
 
     }
 
-    @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
 
         if (e.getSlot() == 0) {

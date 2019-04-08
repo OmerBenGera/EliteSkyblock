@@ -8,9 +8,9 @@ import org.bukkit.block.Block;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class LevelSystem extends ConfigFile {
 
@@ -76,17 +76,17 @@ public class LevelSystem extends ConfigFile {
     }
 
     public int getLevel(Island island) {
-
-        if (hasCooldown(island))
-            return levels.get(island);
-
         int level = 0;
+
+        if (hasCooldown(island)) {
+            return levels.get(island);
+        }
 
         for (int x = island.min.x; x <= island.max.x; x++)
             for (int z = island.min.y; z <= island.max.y; z++)
                 for (int y = 0; y < 256; y++)
                     if (island.spawn.getWorld().getBlockAt(x, y, z) != null || island.spawn.getWorld().getBlockAt(x, y, z).getType() != Material.AIR)
-                        level += Worth.match(island.spawn.getWorld().getBlockAt(x, y, z));
+                        level += getWorth(island.spawn.getWorld().getBlockAt(x, y, z));
 
         cooldowns.put(island, System.currentTimeMillis() + 1200000);
         levels.put(island, level);
@@ -128,46 +128,14 @@ public class LevelSystem extends ConfigFile {
 
     }
 
-    public enum Worth {
-
-        SPAWNER(Material.MOB_SPAWNER, 20),
-        EMERALD_BLOCK(Material.EMERALD_BLOCK, 15),
-        DIAMOND_BLOCK(Material.DIAMOND_BLOCK, 12),
-        IRON_BLOCK(Material.IRON_BLOCK, 9),
-        GOLD_BLOCK(Material.GOLD_BLOCK, 9),
-        REDSTONE_BLOCK(Material.REDSTONE_BLOCK, 6),
-        LAPIS_BLOCK(Material.LAPIS_BLOCK, 6),
-        QUARTZ_BLOCK(Material.QUARTZ_BLOCK, 3),
-        COAL_BLOCK(Material.COAL_BLOCK, 1);
-
-        public Material mat;
-        public byte data;
-        public int worth;
-
-        Worth(Material mat, int worth) {
-
-            this(mat, (byte) 0, worth);
-
+    public long getWorth(Block block) {
+        AtomicLong worth = new AtomicLong();
+        for (String s : Core.getInstance().worthValues.keySet()) {
+            if (block.getType() == Material.getMaterial(s)) {
+                worth.set(Core.getInstance().worthValues.get(s));
+            }
         }
-
-        Worth(Material mat, byte data, int worth) {
-
-            this.mat = mat;
-            this.data = data;
-            this.worth = worth;
-
-        }
-
-        public static int match(Block block) {
-
-            for (Worth worth : Worth.values())
-                if (worth.mat == block.getType() && worth.data == block.getData())
-                    return worth.worth;
-
-            return 0;
-        }
-
-
+        return worth.get();
     }
 
 }

@@ -1,5 +1,6 @@
 package me.jwhz.core.listener.listeners;
 
+import me.jwhz.core.Core;
 import me.jwhz.core.listener.EventClass;
 import me.jwhz.core.skyblock.islands.Island;
 import me.jwhz.core.skyblock.islands.Settings;
@@ -24,7 +25,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static me.jwhz.core.Core.pl;
 
 public class SkyblockProtection extends EventClass {
 
@@ -61,7 +61,7 @@ public class SkyblockProtection extends EventClass {
     public void onDamageEntity(EntityDamageByEntityEvent e) {
 
         if (e.getDamager() instanceof Player && e.getEntity() instanceof LivingEntity && !(e.getEntity() instanceof Monster)
-                && core.skyblockManager.isWithinAnIsland((Player) e.getEntity()) &&
+                && core.skyblockManager.isWithinAnIsland(e.getEntity()) &&
                 !core.skyblockManager.getIsland(e.getDamager().getUniqueId()).equals(core.skyblockManager.getInteractIsland(e.getDamager().getLocation())))
             e.setCancelled(true);
 
@@ -123,20 +123,14 @@ public class SkyblockProtection extends EventClass {
 
             } else {
                 Player p = e.getPlayer();
-                    try {
-                        p.teleport(new Location(
-                                Bukkit.getWorld(pl.getConfig().getString("Island.delete.spawn_location.world")),
-                                pl.getConfig().getInt("Island.delete.spawn_location.x"),
-                                pl.getConfig().getInt("Island.delete.spawn_location.y"),
-                                pl.getConfig().getInt("Island.delete.spawn_location.z")));
-                    } catch (IllegalArgumentException ex) {
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (player.isOp()) {
-                                player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                        "&c&l(!) &c&lERROR: &CNO SPAWN LOCATION SET! Please set it in the config.yml"));
-                                p.teleport(new Location(Bukkit.getWorld("world"), 1, 50, 1));
-                            }
-                    }
+                try {
+                    p.teleport(new Location(
+                            Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                            Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                            Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                            Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
+                } catch (IllegalArgumentException ex) {
+                    p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
                 }
 
             }

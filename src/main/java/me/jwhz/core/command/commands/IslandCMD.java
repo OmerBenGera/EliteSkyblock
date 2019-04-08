@@ -1,5 +1,6 @@
 package me.jwhz.core.command.commands;
 
+import me.jwhz.core.Core;
 import me.jwhz.core.command.CommandBase;
 import me.jwhz.core.config.ConfigValue;
 import me.jwhz.core.gui.guis.skyblock.IslandGUI;
@@ -19,7 +20,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-import static me.jwhz.core.Core.pl;
+
 import static me.jwhz.core.utils.TimeUtils.formatSeconds;
 import static org.bukkit.ChatColor.YELLOW;
 
@@ -187,9 +188,15 @@ public class IslandCMD extends CommandBase {
                 player.sendMessage(playerBanned.replace("$player", target.getName()));
 
                 if (target.isOnline()) {
-                    Location loc = (Location) core.commandManager.getYamlConfiguration().get("Spawn Location");
-
-                    Bukkit.getPlayer(target.getUniqueId()).teleport(loc);
+                    try {
+                        target.getPlayer().teleport(new Location(
+                                Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
+                    } catch (IllegalArgumentException ex) {
+                        target.getPlayer().teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
+                    }
                     Bukkit.getPlayer(target.getUniqueId()).sendMessage(youHaveBeenBanned.replace("$player", player.getName()));
 
                 }
@@ -549,9 +556,15 @@ public class IslandCMD extends CommandBase {
                     island.coop.remove(uuid.toString());
                     island.save();
 
-                    Location loc = (Location) core.commandManager.getYamlConfiguration().get("Spawn Location");
-
-                    player.teleport(loc);
+                    try {
+                        player.teleport(new Location(
+                                Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
+                    } catch (IllegalArgumentException ex) {
+                        player.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
+                    }
 
                     player.sendMessage(leftIsland);
 
@@ -606,10 +619,15 @@ public class IslandCMD extends CommandBase {
                 if (target.isOnline()) {
 
                     target.getPlayer().sendMessage(kicked);
-                    Location loc = (Location) core.commandManager.getYamlConfiguration().get("Spawn Location");
-
-                    target.getPlayer().teleport(loc);
-
+                    try {
+                        target.getPlayer().teleport(new Location(
+                                Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                                Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
+                    } catch (IllegalArgumentException ex) {
+                        target.getPlayer().teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
+                    }
                 }
 
                 player.sendMessage(youveKicked.replace("$player", target.getName()));
@@ -675,7 +693,7 @@ public class IslandCMD extends CommandBase {
 
             }
 
-            if (!player.hasPermission("Skyblock.staff") && !player.hasPermission("Skyblock.admin")) {
+            if (!player.hasPermission("skyblock.staff") && !player.hasPermission("skyblock.admin")) {
 
                 return;
 
@@ -754,12 +772,18 @@ public class IslandCMD extends CommandBase {
 
                 }
                 if (args[1].equalsIgnoreCase("setspawn")) {
-                    pl.getConfig().set("Island.delete.spawn_location.world", player.getLocation().getWorld().getName());
-                    pl.getConfig().set("Island.delete.spawn_location.x", player.getLocation().getX());
-                    pl.getConfig().set("Island.delete.spawn_location.y", player.getLocation().getY());
-                    pl.getConfig().set("Island.delete.spawn_location.z", player.getLocation().getZ());
-                    pl.saveConfig();
+                    Core.getInstance().getConfig().set("Island.delete.spawn_location.world", player.getLocation().getWorld().getName());
+                    Core.getInstance().getConfig().set("Island.delete.spawn_location.x", player.getLocation().getX());
+                    Core.getInstance().getConfig().set("Island.delete.spawn_location.y", player.getLocation().getY());
+                    Core.getInstance().getConfig().set("Island.delete.spawn_location.z", player.getLocation().getZ());
+                    Core.getInstance().saveConfig();
                     player.sendMessage("§a§l(!) §aSpawn set!");
+                } else if (args[1].equals("reload")) {
+                    if (sender.isOp()) {
+                        Core.getInstance().worth.save();
+                        Core.getInstance().worth.reload();
+                        Core.getInstance().fetchValues();
+                    }
                 }
             }
 

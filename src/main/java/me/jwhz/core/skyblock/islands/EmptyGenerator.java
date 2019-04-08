@@ -9,10 +9,9 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
 public class EmptyGenerator extends ChunkGenerator {
-
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
-        return new ArrayList<BlockPopulator>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -22,9 +21,9 @@ public class EmptyGenerator extends ChunkGenerator {
     }
 
     @Override
-    public byte[][] generateBlockSections(World world, Random random, int x, int z, ChunkGenerator.BiomeGrid biomes) {
-
-        return new byte[world.getMaxHeight() / 16][];
-
+    public byte[] generate(World world, Random random, int cx, int cz) {
+        int height = world.getMaxHeight();
+        byte[] result = new byte[256 * height];
+        return result;
     }
 }

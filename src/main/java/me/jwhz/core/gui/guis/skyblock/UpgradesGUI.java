@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -37,7 +38,7 @@ public class UpgradesGUI extends GUI {
 
     }
 
-    @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
 
         if (e.getSlot() == 0) {

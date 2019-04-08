@@ -13,6 +13,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -51,7 +52,7 @@ public class MembersGUI extends GUI {
 
     }
 
-    @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
 
         e.setCancelled(true);
@@ -155,11 +156,11 @@ public class MembersGUI extends GUI {
         members.add(island.owner.toString());
 
         if (island.coop != null)
-            for (String id : island.coop)
+            for (String id : island.coop) {
                 members.add(id);
-
+            }
+        if (members.isEmpty()) return;
         for (int i = 0; i < members.size(); i++) {
-
             inventory.setItem(memberSlots[i], getItem(UUID.fromString(members.get(i)), player.getWorld()));
 
         }
@@ -168,7 +169,7 @@ public class MembersGUI extends GUI {
 
     public ItemStack getItem(UUID id, World world) {
 
-        OfflinePlayer player = Bukkit.getOfflinePlayer(id);
+        Player player = Bukkit.getPlayer(id);
 
         ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -284,8 +285,12 @@ public class MembersGUI extends GUI {
 
     public String getGroup(World world, OfflinePlayer player) {
 
-        if (Core.chat.getPrimaryGroup(world.getName(), player) == null)
+        try {
+            if (Core.chat.getPrimaryGroup(world.getName(), player) == null)
+                return "Default";
+        }catch(NullPointerException e){
             return "Default";
+        }
 
         return Core.chat.getPrimaryGroup(world.getName(), player);
 

@@ -27,10 +27,10 @@
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.yaml:snakeyaml:1.19" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.10" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: :Vault:" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: :worldguard:" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: :worldedit:" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: :PlaceholderAPI:" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: :worldedit:" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: :worldguard:" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: :Vault:" level="project" />
   </component>
 </module>

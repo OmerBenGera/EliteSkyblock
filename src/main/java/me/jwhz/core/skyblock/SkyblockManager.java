@@ -9,15 +9,15 @@ import me.jwhz.core.skyblock.schematics.Schematic;
 import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import static me.jwhz.core.Core.pl;
+
 
 public class SkyblockManager extends Manager<Island> implements ISkyblockManager {
 
@@ -134,7 +134,7 @@ public class SkyblockManager extends Manager<Island> implements ISkyblockManager
     }
 
     @Override
-    public boolean isWithinAnIsland(Player player) {
+    public boolean isWithinAnIsland(Entity player) {
 
         for (Island island : list) {
 
@@ -199,11 +199,19 @@ public class SkyblockManager extends Manager<Island> implements ISkyblockManager
                     e.printStackTrace();
                 }
 
-                Location loc = (Location) core.commandManager.getYamlConfiguration().get("Spawn Location");
-
-                for (Player p : Bukkit.getOnlinePlayers())
-                    if (island.isWithin(p.getLocation()))
-                        p.teleport(loc);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (island.isWithin(p.getLocation())) {
+                        try {
+                            p.teleport(new Location(
+                                    Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
+                        } catch (IllegalArgumentException ex) {
+                            p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
+                        }
+                    }
+                }
 
                 for (int x = island.min.x; x <= island.max.x; x++)
                     for (int z = island.min.y; z <= island.max.y; z++)
@@ -251,18 +259,12 @@ public class SkyblockManager extends Manager<Island> implements ISkyblockManager
                     if (island.isWithin(p.getLocation())) {
                         try {
                             p.teleport(new Location(
-                                    Bukkit.getWorld(pl.getConfig().getString("Island.delete.spawn_location.world")),
-                                    pl.getConfig().getInt("Island.delete.spawn_location.x"),
-                                    pl.getConfig().getInt("Island.delete.spawn_location.y"),
-                                    pl.getConfig().getInt("Island.delete.spawn_location.z")));
+                                    Bukkit.getWorld(Core.getInstance().getConfig().getString("Island.delete.spawn_location.world")),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.x"),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.y"),
+                                    Core.getInstance().getConfig().getInt("Island.delete.spawn_location.z")));
                         } catch (IllegalArgumentException ex) {
-                            for (Player player : Bukkit.getOnlinePlayers()) {
-                                if (player.isOp()) {
-                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                            "&c&l(!) &c&lERROR: &CNO SPAWN LOCATION SET! Please set it in the config.yml"));
-                                    p.teleport(new Location(Bukkit.getWorld("world"), 1, 50, 1));
-                                }
-                            }
+                            p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
                         }
                     }
                 }

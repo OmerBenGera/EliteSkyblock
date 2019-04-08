@@ -3,6 +3,7 @@ package me.jwhz.core.skyblock;
 import me.jwhz.core.skyblock.islands.Island;
 import me.jwhz.core.skyblock.schematics.Schematic;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -13,7 +14,7 @@ public interface ISkyblockManager {
 
     boolean isOwner(UUID uuid);
 
-    boolean isWithinAnIsland(Player player);
+    boolean isWithinAnIsland(Entity player);
 
     boolean isWithinAnIsland(Location location);
 
